@@ -10,6 +10,12 @@ let status = 'disconnected'
 
 ipcMain.handle('daemon:getStatus', () => status)
 
+ipcMain.handle('daemon:kill', (_event, pid: number, createTime: number) => {
+  if (!socket) return { ok: false, error: 'disconnected' }
+  socket.write(JSON.stringify({ type: 'request', action: 'kill', pid, createTime }) + '\n')
+  return { ok: true }
+})
+
 export function connectToDaemon(win: BrowserWindow): void {
   socket = net.createConnection({ path: socketPath })
 

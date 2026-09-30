@@ -7,6 +7,7 @@ declare global {
     { onMessage: (callback: (msg: unknown) => void) => void ,
     onStatus: (callback: (status: string) => void) => void ,
     getStatus: () => Promise<string>,
+    kill: (pid: number, createTime: number) => Promise<{ ok: boolean; error?: string }>,
     }
   }
 }

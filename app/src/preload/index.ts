@@ -12,6 +12,9 @@ const api = {
   },
 
   getStatus: (): Promise<string> => ipcRenderer.invoke('daemon:getStatus'),
+
+  kill: (pid: number, createTime: number): Promise<{ ok: boolean; error?: string }> =>
+  ipcRenderer.invoke('daemon:kill', pid, createTime),
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to
