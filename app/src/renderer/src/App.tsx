@@ -115,8 +115,9 @@ function App(): React.JSX.Element {
   useEffect(() => {
   window.api.onMessage((msg) => console.log('daemon:', msg))
   window.api.onStatus(setStatus)
-}, [])
-
+  window.api.getStatus().then(setStatus)
+  }, [])
+  
   return (
     <div style={{ height: '100vh', width: '100vw' }}>
       <ReactFlow

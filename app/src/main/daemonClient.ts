@@ -1,10 +1,14 @@
 import net from 'node:net'
 import path from 'node:path'
 import type { BrowserWindow } from 'electron'
+import { ipcMain } from 'electron'
 
 const socketPath = path.join(process.env.XDG_RUNTIME_DIR ?? '', 'procdash.sock')
 let socket: net.Socket | null = null
 let retryDelay = 1000
+let status = 'disconnected'
+
+ipcMain.handle('daemon:getStatus', () => status)
 
 export function connectToDaemon(win: BrowserWindow): void {
   socket = net.createConnection({ path: socketPath })
@@ -12,7 +16,7 @@ export function connectToDaemon(win: BrowserWindow): void {
   let buffer = ''
 
   socket.on('connect', () => {
-  console.log('connected')
+  status = 'connected'
   retryDelay = 1000
   win.webContents.send('daemon:status', 'connected')
   })
@@ -34,7 +38,7 @@ export function connectToDaemon(win: BrowserWindow): void {
 
   socket.on('error', (err) => console.log('error:', err.message))
   socket.on('close', () => {
-  console.log(`closed, retrying in ${retryDelay}ms`)
+  status = 'disconnected'
   win.webContents.send('daemon:status', 'disconnected')
   socket = null
   setTimeout(() => connectToDaemon(win), retryDelay)

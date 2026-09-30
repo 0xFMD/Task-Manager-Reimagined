@@ -10,6 +10,8 @@ const api = {
   onStatus: (callback: (status: string) => void): void => {
   ipcRenderer.on('daemon:status', (_event, status) => callback(status))
   },
+
+  getStatus: (): Promise<string> => ipcRenderer.invoke('daemon:getStatus'),
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to
