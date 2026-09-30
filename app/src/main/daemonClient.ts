@@ -1,11 +1,12 @@
 import net from 'node:net'
 import path from 'node:path'
+import type { BrowserWindow } from 'electron'
 
 const socketPath = path.join(process.env.XDG_RUNTIME_DIR ?? '', 'procdash.sock')
 let socket: net.Socket | null = null
 let retryDelay = 1000
 
-export function connectToDaemon(): void {
+export function connectToDaemon(win: BrowserWindow): void {
   socket = net.createConnection({ path: socketPath })
 
   let buffer = ''
@@ -23,7 +24,7 @@ export function connectToDaemon(): void {
   for (const line of lines) {
     if (line === '') continue
     try {
-      console.log('msg:', JSON.parse(line))
+      win.webContents.send('daemon:message', JSON.parse(line))
     } catch {
       console.log('bad line:', line)
     }
@@ -34,7 +35,7 @@ export function connectToDaemon(): void {
   socket.on('close', () => {
   console.log(`closed, retrying in ${retryDelay}ms`)
   socket = null
-  setTimeout(connectToDaemon, retryDelay)
+  setTimeout(() => connectToDaemon(win), retryDelay)
   retryDelay = Math.min(retryDelay * 2, 10000)
   })
 }

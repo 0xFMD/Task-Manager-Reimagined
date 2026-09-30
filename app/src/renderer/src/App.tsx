@@ -2,6 +2,7 @@ import { ReactFlow, Controls, Handle, Position } from '@xyflow/react'
 import type { Node, Edge, NodeProps } from '@xyflow/react'
 import dagre from '@dagrejs/dagre'
 import { Camera, Mic } from 'lucide-react'
+import { useEffect } from 'react'
 
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
@@ -107,6 +108,11 @@ const nodeTypes = {
 }
 
 function App(): React.JSX.Element {
+
+  useEffect(() => {
+    window.api.onMessage((msg) => console.log('daemon:', msg))
+  }, [])
+  
   return (
     <div style={{ height: '100vh', width: '100vw' }}>
       <ReactFlow
