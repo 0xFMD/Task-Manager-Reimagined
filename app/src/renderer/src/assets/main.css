@@ -1,5 +1,5 @@
-@import "tailwindcss";
-@import "@xyflow/react/dist/style.css";
+@import 'tailwindcss';
+@import '@xyflow/react/dist/style.css';
 
 :root {
   --radius: 0.625rem;
@@ -78,6 +78,4 @@
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
   }
-
 }
-

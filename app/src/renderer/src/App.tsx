@@ -10,30 +10,36 @@ const nodeWidth = 180
 const nodeHeight = 60
 
 type Process = {
-  pid:number,
-  name:string,
-  usesCamera:boolean,
-  usesMic:boolean,
-  parent:number | null
+  pid: number
+  name: string
+  usesCamera: boolean
+  usesMic: boolean
+  parent: number | null
 }
 
-const processes:Process[] = [
-  {pid:1, name:"kernel", parent:null, usesCamera:false, usesMic:false},
-  {pid:2, name:"inotify", parent:1, usesCamera:false, usesMic:false},
-  {pid:3, name:"browser", parent:1, usesCamera:false, usesMic:false},
-  {pid:4, name:"browser video call", parent:3, usesCamera:true, usesMic:true},
-  {pid:5, name:"file watcher", parent:2, usesCamera:false, usesMic:false},
-  {pid:6, name:"file organizer", parent:5, usesCamera:false, usesMic:false},
-  {pid:7, name:"video player", parent:1, usesCamera:false, usesMic:false},
+const processes: Process[] = [
+  { pid: 1, name: 'kernel', parent: null, usesCamera: false, usesMic: false },
+  { pid: 2, name: 'inotify', parent: 1, usesCamera: false, usesMic: false },
+  { pid: 3, name: 'browser', parent: 1, usesCamera: false, usesMic: false },
+  { pid: 4, name: 'browser video call', parent: 3, usesCamera: true, usesMic: true },
+  { pid: 5, name: 'file watcher', parent: 2, usesCamera: false, usesMic: false },
+  { pid: 6, name: 'file organizer', parent: 5, usesCamera: false, usesMic: false },
+  { pid: 7, name: 'video player', parent: 1, usesCamera: false, usesMic: false }
 ]
 
-const nodes: Node<Process>[] = processes.map((process) =>{
-  return {id: String(process.pid), type: "process", position: { x: 0, y: 0 }, data:process}
+const nodes: Node<Process>[] = processes.map((p) => {
+  return { id: String(p.pid), type: 'process', position: { x: 0, y: 0 }, data: p }
 })
 
-const edges: Edge[] = processes.filter((process)=> process.parent !== null ).map((process) => {
-  return {id: `${process.parent}-${process.pid}`,source: String(process.parent), target: String(process.pid)}
-})
+const edges: Edge[] = processes
+  .filter((process) => process.parent !== null)
+  .map((process) => {
+    return {
+      id: `${process.parent}-${process.pid}`,
+      source: String(process.parent),
+      target: String(process.pid)
+    }
+  })
 
 function getLayoutedElements(nodes: Node<Process>[], edges: Edge[]) {
   const g = new dagre.graphlib.Graph()
@@ -57,8 +63,8 @@ function getLayoutedElements(nodes: Node<Process>[], edges: Edge[]) {
       ...node,
       position: {
         x: dagreNode.x - nodeWidth / 2,
-        y: dagreNode.y - nodeHeight / 2,
-      },
+        y: dagreNode.y - nodeHeight / 2
+      }
     }
   })
 
@@ -67,7 +73,7 @@ function getLayoutedElements(nodes: Node<Process>[], edges: Edge[]) {
 
 const layouted = getLayoutedElements(nodes, edges)
 
-type ProcessNodeType = Node<Process,"process">
+type ProcessNodeType = Node<Process, 'process'>
 
 function ProcessNode({ data }: NodeProps<ProcessNodeType>) {
   return (
@@ -81,25 +87,39 @@ function ProcessNode({ data }: NodeProps<ProcessNodeType>) {
       </div>
 
       <div className="flex gap-4 self-center">
-        {data.usesCamera && <Badge variant="destructive"><Camera /></Badge>}
-        {data.usesMic && <Badge variant="destructive"><Mic /></Badge>}
+        {data.usesCamera && (
+          <Badge variant="destructive">
+            <Camera />
+          </Badge>
+        )}
+        {data.usesMic && (
+          <Badge variant="destructive">
+            <Mic />
+          </Badge>
+        )}
       </div>
     </Card>
-  )}
+  )
+}
 
 const nodeTypes = {
-  process: ProcessNode,
+  process: ProcessNode
 }
 
 function App(): React.JSX.Element {
-  
   return (
     <div style={{ height: '100vh', width: '100vw' }}>
-      <ReactFlow  nodes={layouted.nodes} edges={layouted.edges} fitView nodeTypes={nodeTypes} colorMode='dark'>
+      <ReactFlow
+        nodes={layouted.nodes}
+        edges={layouted.edges}
+        fitView
+        nodeTypes={nodeTypes}
+        colorMode="dark"
+      >
         <Controls />
       </ReactFlow>
     </div>
-  );
+  )
 }
 
 export default App
