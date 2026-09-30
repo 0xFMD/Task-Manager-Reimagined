@@ -149,12 +149,12 @@ export default function ProcessDialog({ process, onClose }): ReactElement | null
                 <span className="font-semibold">{process?.net_tx} KB/s</span>
               </div>
 
-              <div className="flex justify-around">
-                <Button variant="destructive" onClick={onBlockNetwork}>
+              <div className="flex justify-around ">
+                <Button variant="destructive" onClick={onBlockNetwork} className="cursor-pointer">
                   Block Network
                 </Button>
 
-                <Button variant="outline" onClick={onUnblockNetwork}>
+                <Button variant="outline" onClick={onUnblockNetwork} className="cursor-pointer">
                   Unblock Network
                 </Button>
               </div>
@@ -163,15 +163,15 @@ export default function ProcessDialog({ process, onClose }): ReactElement | null
 
           <section className="border-t pt-4">
             <div className="grid grid-cols-3 gap-3">
-              <Button variant="default" onClick={onSuspend}>
+              <Button variant="default" onClick={onSuspend} className="cursor-pointer">
                 Suspend
               </Button>
 
-              <Button variant="outline" onClick={onTerminate}>
+              <Button variant="outline" onClick={onTerminate} className="cursor-pointer">
                 Terminate
               </Button>
 
-              <Button variant="destructive" onClick={onKill}>
+              <Button variant="destructive" onClick={onKill} className="cursor-pointer">
                 Kill
               </Button>
             </div>
