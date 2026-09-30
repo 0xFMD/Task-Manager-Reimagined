@@ -2,10 +2,11 @@ import { ReactFlow, Controls, Handle, Position } from '@xyflow/react'
 import type { Node, Edge, NodeProps } from '@xyflow/react'
 import dagre from '@dagrejs/dagre'
 import { Camera, Mic } from 'lucide-react'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
+import { Panel } from '@xyflow/react'
 
 const nodeWidth = 180
 const nodeHeight = 60
@@ -108,11 +109,14 @@ const nodeTypes = {
 }
 
 function App(): React.JSX.Element {
+  
+  const [status, setStatus] = useState('disconnected')
 
   useEffect(() => {
-    window.api.onMessage((msg) => console.log('daemon:', msg))
-  }, [])
-  
+  window.api.onMessage((msg) => console.log('daemon:', msg))
+  window.api.onStatus(setStatus)
+}, [])
+
   return (
     <div style={{ height: '100vh', width: '100vw' }}>
       <ReactFlow
@@ -122,6 +126,11 @@ function App(): React.JSX.Element {
         nodeTypes={nodeTypes}
         colorMode="dark"
       >
+        <Panel 
+        position="top-left"
+        className={status === 'connected' ? 'text-green-400' : 'text-red-400'}>
+        {status} 
+        </Panel>
         <Controls />
       </ReactFlow>
     </div>

@@ -14,6 +14,7 @@ export function connectToDaemon(win: BrowserWindow): void {
   socket.on('connect', () => {
   console.log('connected')
   retryDelay = 1000
+  win.webContents.send('daemon:status', 'connected')
   })
 
   socket.on('data', (chunk) => {
@@ -34,6 +35,7 @@ export function connectToDaemon(win: BrowserWindow): void {
   socket.on('error', (err) => console.log('error:', err.message))
   socket.on('close', () => {
   console.log(`closed, retrying in ${retryDelay}ms`)
+  win.webContents.send('daemon:status', 'disconnected')
   socket = null
   setTimeout(() => connectToDaemon(win), retryDelay)
   retryDelay = Math.min(retryDelay * 2, 10000)

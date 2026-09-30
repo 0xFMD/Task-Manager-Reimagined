@@ -5,7 +5,11 @@ import { electronAPI } from '@electron-toolkit/preload'
 const api = {
   onMessage: (callback: (msg: unknown) => void): void => {
     ipcRenderer.on('daemon:message', (_event, msg) => callback(msg))
-  }
+  },
+
+  onStatus: (callback: (status: string) => void): void => {
+  ipcRenderer.on('daemon:status', (_event, status) => callback(status))
+  },
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to
