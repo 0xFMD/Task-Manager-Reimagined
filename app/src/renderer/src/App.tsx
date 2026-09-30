@@ -1,45 +1,81 @@
-import Versions from './components/Versions'
-import electronLogo from './assets/electron.svg'
-import { Badge } from "@/components/ui/badge"
-import { Button } from './components/ui/button'
+import { ReactFlow, Controls, Handle, Position } from '@xyflow/react'
+import type { Node, Edge, NodeProps } from '@xyflow/react'
+import dagre from '@dagrejs/dagre'
+import { Camera, Mic } from 'lucide-react'
+
+import { Badge } from '@/components/ui/badge'
+import { Card } from '@/components/ui/card'
+
+const nodeWidth = 180
+const nodeHeight = 60
+
+type Process = {
+  pid:number,
+  name:string,
+  usesCamera:boolean,
+  usesMic:boolean,
+  parent:number | null
+}
+
+const processes:Process[] = [
+  {pid:1, name:"kernel", parent:null, usesCamera:false, usesMic:false},
+  {pid:2, name:"inotify", parent:1, usesCamera:false, usesMic:false},
+  {pid:3, name:"browser", parent:1, usesCamera:false, usesMic:false},
+  {pid:4, name:"browser video call", parent:3, usesCamera:true, usesMic:true},
+  {pid:5, name:"file watcher", parent:2, usesCamera:false, usesMic:false},
+  {pid:6, name:"file organizer", parent:5, usesCamera:false, usesMic:false},
+  {pid:7, name:"video player", parent:1, usesCamera:false, usesMic:false},
+]
+
+const nodes: Node<Process>[] = processes.map((process) =>{
+  return {id: String(process.pid), type: "process", position: { x: 0, y: 0 }, data:process}
+})
+
+const edges: Edge[] = processes.filter((process)=> process.parent !== null ).map((process) => {
+  return {id: `${process.parent}-${process.pid}`,source: String(process.parent), target: String(process.pid)}
+})
+
+function getLayoutedElements(nodes: Node<Process>[], edges: Edge[]) {
+  const g = new dagre.graphlib.Graph()
+  g.setGraph({ rankdir: 'TB' })
+  g.setDefaultEdgeLabel(() => ({}))
+
+  nodes.forEach((node) => {
+    g.setNode(node.id, { label: node.data.name, width: nodeWidth, height: nodeHeight })
+  })
+
+  edges.forEach((edge) => {
+    g.setEdge(edge.source, edge.target)
+  })
+
+  dagre.layout(g)
+
+  const layoutedNodes = nodes.map((node) => {
+    const dagreNode = g.node(node.id)
+
+    return {
+      ...node,
+      position: {
+        x: dagreNode.x - nodeWidth / 2,
+        y: dagreNode.y - nodeHeight / 2,
+      },
+    }
+  })
+
+  return { nodes: layoutedNodes, edges }
+}
+
+const layouted = getLayoutedElements(nodes, edges)
 
 function App(): React.JSX.Element {
-  const ipcHandle = (): void => window.electron.ipcRenderer.send('ping')
-
+  
   return (
-    <div className="flex flex-col items-start gap-6 p-6 bg-neutral-50 dark:bg-neutral-900 rounded-xl max-w-md border border-neutral-200/50 dark:border-neutral-800">
-      <div className="flex flex-col gap-1.5">
-        <h2 className="text-xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50">
-          Process Control Panel
-        </h2>
-        <p className="text-sm text-neutral-500 dark:text-neutral-400">
-          Manage system execution steps and runtime targets.
-        </p>
-      </div>
-      
-      {/* Badges Row */}
-      <div className="flex flex-wrap gap-2">
-        <Badge variant="default">Core Service</Badge>
-        <Badge variant="secondary">Worker #1</Badge>
-        <Badge className="bg-emerald-500 text-white hover:bg-emerald-600 border-none">
-          Online
-        </Badge>
-      </div>
-
-      {/* Buttons Interactive Row */}
-      <div className="flex items-center gap-3 w-full border-t border-neutral-200/60 dark:border-neutral-800 pt-4">
-        {/* Standard Action Button */}
-        <Button variant="default" size="sm" onClick={() => alert('Starting process...')}>
-          Start Process
-        </Button>
-
-        {/* Secondary Cancel Button */}
-        <Button variant="outline" size="sm">
-          Kill Task
-        </Button>
-      </div>
+    <div style={{ height: '100vh', width: '100vw' }}>
+      <ReactFlow  nodes={layouted.nodes} edges={layouted.edges} fitView>
+        <Controls />
+      </ReactFlow>
     </div>
-  )
+  );
 }
 
 export default App
