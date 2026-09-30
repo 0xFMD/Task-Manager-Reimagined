@@ -56,4 +56,13 @@ class ProcessManager:
             return {"isSuccess": False, "message": str(e)}
 
     def kill_process(self, pid):
-        pass
+        try:
+            proc = psutil.Process(pid)
+            proc.kill()
+            return {"isSuccess": True, "message": f"Process {pid} killed successfully"}
+        except psutil.NoSuchProcess:
+            return {"isSuccess": False, "message": f"Process {pid} not found"}
+        except psutil.AccessDenied:
+            return {"isSuccess": False, "message": f"Access denied to kill process {pid}"}
+        except Exception as e:
+            return {"isSuccess" : False,"message": str(e)}
