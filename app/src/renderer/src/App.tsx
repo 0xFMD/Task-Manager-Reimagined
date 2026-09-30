@@ -67,11 +67,35 @@ function getLayoutedElements(nodes: Node<Process>[], edges: Edge[]) {
 
 const layouted = getLayoutedElements(nodes, edges)
 
+type ProcessNodeType = Node<Process,"process">
+
+function ProcessNode({ data }: NodeProps<ProcessNodeType>) {
+  return (
+    <Card className="w-[180px] h-[60px] py-2 px-3 flex flex-col justify-between transition-shadow hover:ring-2 hover:ring-primary">
+      <Handle type="target" position={Position.Top} />
+      <Handle type="source" position={Position.Bottom} />
+
+      <div>
+        <div className="text-sm font-medium">{data.name}</div>
+        <div className="text-xs text-muted-foreground">PID {data.pid}</div>
+      </div>
+
+      <div className="flex gap-4 self-center">
+        {data.usesCamera && <Badge variant="destructive"><Camera /></Badge>}
+        {data.usesMic && <Badge variant="destructive"><Mic /></Badge>}
+      </div>
+    </Card>
+  )}
+
+const nodeTypes = {
+  process: ProcessNode,
+}
+
 function App(): React.JSX.Element {
   
   return (
     <div style={{ height: '100vh', width: '100vw' }}>
-      <ReactFlow  nodes={layouted.nodes} edges={layouted.edges} fitView>
+      <ReactFlow  nodes={layouted.nodes} edges={layouted.edges} fitView nodeTypes={nodeTypes} colorMode='dark'>
         <Controls />
       </ReactFlow>
     </div>
