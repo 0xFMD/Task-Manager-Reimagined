@@ -32,7 +32,16 @@ class ProcessManager:
 
 
     def suspend_process(self, pid):
-        pass
+        try:
+            proc = psutil.Process(pid)
+            proc.suspend()
+            return {"isSuccess": True, "message": f"Process {pid} suspended successfully."}
+        except psutil.NoSuchProcess:
+            return {"isSuccess": False, "message": f"Process {pid} does not exist."}
+        except psutil.AccessDenied:
+            return {"isSuccess": False, "message": f"Access denied to suspend process {pid}."}
+        except Exception as e:
+            return {"isSuccess": False, "message": str(e)}
 
     def resume_process(self, pid):
         pass
