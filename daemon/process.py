@@ -44,7 +44,16 @@ class ProcessManager:
             return {"isSuccess": False, "message": str(e)}
 
     def resume_process(self, pid):
-        pass
+        try:
+            proc = psutil.Process(pid)
+            proc.resume()
+            return {"isSuccess": True, "message": f"Process {pid} resumed successfully."}
+        except psutil.NoSuchProcess:
+            return {"isSuccess": False, "message": f"Process {pid} does not exist."}
+        except psutil.AccessDenied:
+            return {"isSuccess": False, "message": f"Access denied to resume process {pid}."}
+        except Exception as e:
+            return {"isSuccess": False, "message": str(e)}
 
     def kill_process(self, pid):
         pass
