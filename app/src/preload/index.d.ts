@@ -6,13 +6,11 @@ declare global {
   interface Window {
     electron: ElectronAPI
     api: 
-    { onMessage: (callback: (msg: unknown) => void) => void ,
-    onStatus: (callback: (status: string) => void) => void ,
-    getStatus: () => Promise<string>,
-    kill: (pid: number, createTime: number) => Promise<Result>,
-    suspend: (pid: number, createTime: number) => Promise<Result>
-    resume: (pid: number, createTime: number) => Promise<Result>
-    list: () => Promise<Result>
+    {
+      onMessage: (callback: (msg: unknown) => void) => void
+      onStatus: (callback: (status: string) => void) => void
+      getStatus: () => Promise<string>
+      request: (payload: object) => void
     }
   }
 }

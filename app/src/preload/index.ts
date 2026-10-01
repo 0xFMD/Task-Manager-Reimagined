@@ -10,26 +10,12 @@ const api = {
   },
 
   onStatus: (callback: (status: string) => void): void => {
-  ipcRenderer.on('daemon:status', (_event, status) => callback(status))
+    ipcRenderer.on('daemon:status', (_event, status) => callback(status))
   },
 
   getStatus: (): Promise<string> => ipcRenderer.invoke('daemon:getStatus'),
 
-  kill: (pid: number, createTime: number): Promise<Result> =>
-  ipcRenderer.invoke('daemon:kill', pid, createTime),
-
-  suspend: (pid: number, createTime: number): Promise<Result> =>
-  ipcRenderer.invoke('daemon:suspend', pid, createTime),
-  
-  resume: (pid: number, createTime: number): Promise<Result> =>
-  ipcRenderer.invoke('daemon:resume', pid, createTime),
-
-  list: (): Promise<Result> =>
-  ipcRenderer.invoke('daemon:list'),
-
-  sendRequest: (payload) => {
-  ipcRenderer.send('daemon-request', payload)
-  }
+  request: (payload: object): Promise<Result> => ipcRenderer.invoke('daemon:request', payload)
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

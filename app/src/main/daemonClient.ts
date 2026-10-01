@@ -10,24 +10,11 @@ let status = 'disconnected'
 
 ipcMain.handle('daemon:getStatus', () => status)
 
-function sendRequest(msg: object): { ok: boolean; error?: string } {
+ipcMain.handle('daemon:request', (_e, payload) => {
   if (!socket) return { ok: false, error: 'disconnected' }
-  socket.write(JSON.stringify({...msg }) + '\n')
+  socket.write(JSON.stringify(payload) + '\n')
   return { ok: true }
-}
-
-ipcMain.handle('daemon:kill', (_e, pid: number, createTime: number) =>
-  sendRequest({ type: 'process', action: 'kill_process', pid, createTime })
-)
-ipcMain.handle('daemon:suspend', (_e, pid: number, createTime: number) =>
-  sendRequest({ type: 'process', action: 'suspend_process', pid, createTime })
-)
-ipcMain.handle('daemon:resume', (_e, pid: number, createTime: number) =>
-  sendRequest({ type: 'process', action: 'resume_process', pid, createTime })
-)
-ipcMain.handle('daemon:list', (_e) =>
-  sendRequest({ type: 'process', action: 'list_process'})
-)
+})
 
 export function connectToDaemon(win: BrowserWindow): void {
   socket = net.createConnection({ path: socketPath })
