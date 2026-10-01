@@ -1,27 +1,116 @@
 import psutil
+import os
 
 
 class ProcessManager:
+
     def __init__(self):
         self.handlers = {
             "list_process": self.list_process,
-            "get_process": self.get_process,
             "suspend_process": self.suspend_process,
             "resume_process": self.resume_process,
             "kill_process": self.kill_process,
         }
 
     def list_process(self):
-        pass
+        processes = []
 
-    def get_process(self, pid):
-        pass
+        for process in psutil.process_iter(
+            [
+                "pid",
+                "ppid",
+                "name",
+                "status",
+                "username",
+                "cpu_percent",
+                "memory_percent",
+                "memory_info",
+                "num_threads",
+                "cpu_num",
+            ]
+        ):
+
+            process.info.update(self.get_input_usage(process.pid))
+            processes.append(process.info)
+
+        return {"isSuccess": True, "data": processes}
 
     def suspend_process(self, pid):
-        pass
+        try:
+            proc = psutil.Process(pid)
+            proc.suspend()
+            return {
+                "isSuccess": True,
+                "message": f"Process {pid} suspended successfully.",
+            }
+        except psutil.NoSuchProcess:
+            return {
+                "isSuccess": False,
+                "message": f"Process {pid} does not exist.",
+            }
+        except psutil.AccessDenied:
+            return {
+                "isSuccess": False,
+                "message": f"Access denied to suspend process {pid}.",
+            }
+        except Exception as e:
+            return {"isSuccess": False, "message": str(e)}
 
     def resume_process(self, pid):
-        pass
+        try:
+            proc = psutil.Process(pid)
+            proc.resume()
+            return {
+                "isSuccess": True,
+                "message": f"Process {pid} resumed successfully.",
+            }
+        except psutil.NoSuchProcess:
+            return {
+                "isSuccess": False,
+                "message": f"Process {pid} does not exist.",
+            }
+        except psutil.AccessDenied:
+            return {
+                "isSuccess": False,
+                "message": f"Access denied to resume process {pid}.",
+            }
+        except Exception as e:
+            return {"isSuccess": False, "message": str(e)}
 
     def kill_process(self, pid):
-        pass
+        try:
+            proc = psutil.Process(pid)
+            proc.kill()
+            return {
+                "isSuccess": True,
+                "message": f"Process {pid} killed successfully",
+            }
+        except psutil.NoSuchProcess:
+            return {"isSuccess": False, "message": f"Process {pid} not found"}
+        except psutil.AccessDenied:
+            return {
+                "isSuccess": False,
+                "message": f"Access denied to kill process {pid}",
+            }
+        except Exception as e:
+            return {"isSuccess": False, "message": str(e)}
+
+    def get_input_usage(self, pid):
+        device = {"camera": False, "mic": False}
+        fd_path = f"/proc/{pid}/fd"
+
+        try:
+            for fd in os.listdir(fd_path):
+                dev = os.readlink(f"{fd_path}/{fd}")
+
+                if dev.startswith("/dev/video"):
+                    device["camera"] = True
+
+                if dev.startswith("/dev/snd/pcm") and dev.endswith(
+                    "c"
+                ):  # pcm device ends with "c" means it's capture device
+                    device["mic"] = True
+        except:
+            pass
+
+        return device

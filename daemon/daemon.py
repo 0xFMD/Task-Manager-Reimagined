@@ -20,7 +20,29 @@ class Daemon:
             "network": self.network.handlers,
         }
 
+    def daemonize(self):
+        pid = os.fork()
+
+        if pid > 0:
+            os._exit(0)
+
+        os.setsid()
+
+        pid = os.fork()
+
+        if pid > 0:
+            os._exit(0)
+
+        devnull = os.open(os.devnull, os.O_RDWR)
+        os.dup2(devnull, 0)
+        os.dup2(devnull, 1)
+        os.dup2(devnull, 2)
+
+        os.close(devnull)
+
     def start(self):
+        self.daemonize()
+
         if os.path.exists(SOCKET_PATH):
             os.remove(SOCKET_PATH)
         self.server = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
@@ -34,24 +56,30 @@ class Daemon:
             self.handle_client(connection)
 
     def handle_client(self, client):
-        while True:
-            data = client.recv(4096)
+        client.settimeout(3)
 
-            if not data:
-                break
+        while True:
 
             try:
-                req = json.loads(data.decode())
-            except json.JSONDecodeError:
-                continue
+                data = client.recv(4096)
+                if not data:
+                    break
+                res = self.handle_request(json.loads(data.decode()))
+            except socket.timeout:
+                res = {
+                    "type": "event",
+                    "event": "list_process",
+                    "data": self.processes.list_process().get("data"),
+                }
 
-            res = self.handle_request(req)
-            client.send(json.dumps(res).encode())
+            try:
+                client.send((json.dumps(res) + "\n").encode())
+            except:
+                break
 
         client.close()
 
     def handle_request(self, req):
-        print(req)
         req_type = req.get("type")
         req_action = req.get("action")
         data = req.get("data", {})
@@ -64,6 +92,5 @@ class Daemon:
         return handler(**data)
 
 
-d1 = Daemon()
-
-d1.start()
+if __name__ == "__main__":
+    Daemon().start()
