@@ -33,6 +33,7 @@ ENV/
 .coverage
 htmlcov/
 
+*.egg-info/
 
 .env
 .env.*

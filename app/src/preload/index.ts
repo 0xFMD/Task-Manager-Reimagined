@@ -15,6 +15,10 @@ const api = {
 
   kill: (pid: number, createTime: number): Promise<{ ok: boolean; error?: string }> =>
   ipcRenderer.invoke('daemon:kill', pid, createTime),
+
+  sendRequest: (payload) => {
+    ipcRenderer.send('daemon-request', payload)
+  }
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to
