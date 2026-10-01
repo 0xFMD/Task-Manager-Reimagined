@@ -1,5 +1,4 @@
-<p align="center"><img alt="Proc" src="assets/proc-icon.svg" width="120"/>
-<h1 align="center">Task Manager Reimagined</h1>
+<h3 align="center">Task Manager Reimagined</h2>
 
 <p align="center">Visualization of the process tree</p>
 
