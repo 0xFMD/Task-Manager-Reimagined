@@ -19,13 +19,14 @@ type Process = {
   name: string
   mic: boolean
   camera: boolean
-  children: Process[] | null
 }
 
-function ProcessChildren({ root }: { root: Process }) {
+function ProcessChildren({ root, processes }: { root: Process; processes: Process[] }) {
   const [open, setOpen] = useState(false)
 
-  const hasChildren = root.children
+  const children = processes.filter((process) => process.ppid === root.pid)
+
+  const hasChildren = children.length > 0
 
   return (
     <>
@@ -48,9 +49,9 @@ function ProcessChildren({ root }: { root: Process }) {
       </SidebarMenuItem>
 
       {open &&
-        root.children?.map((child) => (
+        children.map((child) => (
           <div key={child.pid} className="pl-4">
-            <ProcessChildren root={child} />
+            <ProcessChildren root={child} processes={processes} />
           </div>
         ))}
     </>
@@ -62,19 +63,15 @@ export default function ProcessSidebar({ processes }: { processes: Process[] }) 
   const [micOnly, setMicOnly] = useState(false)
   const [cameraOnly, setCameraOnly] = useState(false)
 
-  for (const process of processes) {
-    process.children = processes.filter((child) => child.ppid === process.pid)
-  }
-
   const rootProcs = processes.filter((process) => process.ppid === 0)
 
-  const filteredProcs = processes.filter((proc) => {
-    if (micOnly && !proc.mic) return false
-    if (cameraOnly && !proc.camera) return false
+  const filteredProcs = processes.filter((process) => {
+    if (micOnly && !process.mic) return false
+    if (cameraOnly && !process.camera) return false
 
     const search = query.toLowerCase()
 
-    return proc.name.toLowerCase().includes(search)
+    return process.name.toLowerCase().includes(search)
   })
 
   return (
@@ -118,7 +115,9 @@ export default function ProcessSidebar({ processes }: { processes: Process[] }) 
                     </Button>
                   </SidebarMenuItem>
                 ))
-              : rootProcs.map((process) => <ProcessChildren key={process.pid} root={process} />)}
+              : rootProcs.map((process) => (
+                  <ProcessChildren key={process.pid} root={process} processes={processes} />
+                ))}
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
