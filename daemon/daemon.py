@@ -20,7 +20,29 @@ class Daemon:
             "network": self.network.handlers,
         }
 
+    def daemonize(self):
+        pid = os.fork()
+
+        if pid > 0:
+            os.exit(0)
+
+        os.setsid()
+
+        pid = os.fork()
+
+        if pid > 0:
+            os._exit(0)
+
+        devnull = os.open(os.devnull, os.O_RDWR)
+        os.dup2(devnull, 0)
+        os.dup2(devnull, 1)
+        os.dup2(devnull, 2)
+
+        os.close(devnull)
+
     def start(self):
+        self.daemonize()
+
         if os.path.exists(SOCKET_PATH):
             os.remove(SOCKET_PATH)
         self.server = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
