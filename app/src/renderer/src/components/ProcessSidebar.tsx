@@ -12,6 +12,7 @@ import { Input } from './ui/input'
 import { Button } from './ui/button'
 
 import { Camera, ChevronDown, ChevronRight, Mic } from 'lucide-react'
+import { ScrollArea } from './ui/scroll-area'
 
 type Process = {
   pid: number
@@ -102,25 +103,27 @@ export default function ProcessSidebar({ processes }: { processes: Process[] }) 
         </div>
       </SidebarHeader>
 
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarMenu>
-            {query !== '' || micOnly || cameraOnly
-              ? filteredProcs.map((process) => (
-                  <SidebarMenuItem key={process.pid}>
-                    <Button variant="ghost" className="w-full justify-start">
-                      <span>{process.name}</span>
+      <ScrollArea>
+        <SidebarContent>
+          <SidebarGroup>
+            <SidebarMenu>
+              {query !== '' || micOnly || cameraOnly
+                ? filteredProcs.map((process) => (
+                    <SidebarMenuItem key={process.pid}>
+                      <Button variant="ghost" className="w-full justify-start">
+                        <span>{process.name}</span>
 
-                      <span className="ml-auto text-xs text-muted-foreground">{process.pid}</span>
-                    </Button>
-                  </SidebarMenuItem>
-                ))
-              : rootProcs.map((process) => (
-                  <ProcessChildren key={process.pid} root={process} processes={processes} />
-                ))}
-          </SidebarMenu>
-        </SidebarGroup>
-      </SidebarContent>
+                        <span className="ml-auto text-xs text-muted-foreground">{process.pid}</span>
+                      </Button>
+                    </SidebarMenuItem>
+                  ))
+                : rootProcs.map((process) => (
+                    <ProcessChildren key={process.pid} root={process} processes={processes} />
+                  ))}
+            </SidebarMenu>
+          </SidebarGroup>
+        </SidebarContent>
+      </ScrollArea>
     </Sidebar>
   )
 }
