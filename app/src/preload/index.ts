@@ -1,6 +1,8 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 
+type Result = { ok: boolean; error?: string }
+
 // Custom APIs for renderer
 const api = {
   onMessage: (callback: (msg: unknown) => void): void => {
@@ -13,8 +15,14 @@ const api = {
 
   getStatus: (): Promise<string> => ipcRenderer.invoke('daemon:getStatus'),
 
-  kill: (pid: number, createTime: number): Promise<{ ok: boolean; error?: string }> =>
+  kill: (pid: number, createTime: number): Promise<Result> =>
   ipcRenderer.invoke('daemon:kill', pid, createTime),
+
+  suspend: (pid: number, createTime: number): Promise<Result> =>
+  ipcRenderer.invoke('daemon:suspend', pid, createTime),
+  
+  resume: (pid: number, createTime: number): Promise<Result> =>
+  ipcRenderer.invoke('daemon:resume', pid, createTime),
 
   sendRequest: (payload) => {
     ipcRenderer.send('daemon-request', payload)
