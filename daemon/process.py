@@ -12,39 +12,26 @@ class ProcessManager:
         }
 
     def list_process(self):
-        proc_dict = {}
+        processes = []
 
-        for proc in psutil.process_iter():
-            try:
-                with proc.oneshot():
-                    pid = proc.pid
-                    proc_dict[pid] = {
-                        "pid": pid,
-                        "ppid": proc.ppid(),
-                        "name": proc.name(),
-                        "status": proc.status(),
-                        "cpu_percent": proc.cpu_percent(interval=None),
-                        "memory_percent": round(proc.memory_percent(), 2),
-                        "children": []
-                    }
-            except (
-                psutil.NoSuchProcess,
-                psutil.AccessDenied,
-                psutil.ZombieProcess,
-            ):
-                continue
+        for process in psutil.process_iter(
+            [
+                "pid",
+                "ppid",
+                "name",
+                "status",
+                "username",
+                "cpu_percent",
+                "memory_percent",
+                "memory_info",
+                "num_threads",
+                "cpu_num",
+            ]
+        ):
 
-        tree = []
+            processes.append(process.info)
 
-        for pid, pinfo in proc_dict.items():
-            ppid = pinfo["ppid"]
-
-            if ppid in proc_dict and ppid != pid:
-                proc_dict[ppid]["children"].append(pinfo)
-            else:
-                tree.append(pinfo)
-
-        return {"isSuccess": True, "data": tree}
+            return {"isSuccess": True, "data": processes}
 
     def suspend_process(self, pid):
         try:
@@ -105,6 +92,7 @@ class ProcessManager:
             }
         except Exception as e:
             return {"isSuccess": False, "message": str(e)}
+
 
 if __name__ == "__main__":
     pm = ProcessManager()
