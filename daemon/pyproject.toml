@@ -1,7 +1,7 @@
 [project]
 name = "daemon"
 version = "0.1.0"
-dependencies = ["psutil", "ruff"]
+dependencies = ["psutil", "ruff","iptc", "socket"]
 
 [tool.setuptools]
 packages = []
