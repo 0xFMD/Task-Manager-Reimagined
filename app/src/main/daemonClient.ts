@@ -12,18 +12,18 @@ ipcMain.handle('daemon:getStatus', () => status)
 
 function sendRequest(msg: object): { ok: boolean; error?: string } {
   if (!socket) return { ok: false, error: 'disconnected' }
-  socket.write(JSON.stringify({ type: 'request', ...msg }) + '\n')
+  socket.write(JSON.stringify({...msg }) + '\n')
   return { ok: true }
 }
 
 ipcMain.handle('daemon:kill', (_e, pid: number, createTime: number) =>
-  sendRequest({ action: 'kill', pid, createTime })
+  sendRequest({ type: 'process', action: 'kill_process', pid, createTime })
 )
 ipcMain.handle('daemon:suspend', (_e, pid: number, createTime: number) =>
-  sendRequest({ action: 'suspend', pid, createTime })
+  sendRequest({ type: 'process', action: 'suspend_process', pid, createTime })
 )
 ipcMain.handle('daemon:resume', (_e, pid: number, createTime: number) =>
-  sendRequest({ action: 'resume', pid, createTime })
+  sendRequest({ type: 'process', action: 'resume_process', pid, createTime })
 )
 
 export function connectToDaemon(win: BrowserWindow): void {
