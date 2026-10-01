@@ -11,38 +11,44 @@ const colorize = (number: number) => {
 export default function ProcessDialog({ process, onClose }): ReactElement | null {
   if (!process) return null
 
-  const onKill = () => {
-    window.api.sendRequest({
+  const onKill = (): void => {
+    if (!process) return
+
+    window.api.request({
       type: 'process',
       action: 'kill_process',
       data: {
-        pid: process?.pid
+        pid: process.pid
       }
     })
   }
 
-  const onTerminate = () => {
-    window.api.sendRequest({
+  const onResume = (): void => {
+    if (!process) return
+
+    window.api.request({
       type: 'process',
-      action: 'terminate_process',
+      action: 'resume_process',
       data: {
-        pid: process?.pid
+        pid: process.pid
       }
     })
   }
 
-  const onSuspend = () => {
-    window.api.sendRequest({
+  const onSuspend = (): void => {
+    if (!process) return
+
+    window.api.request({
       type: 'process',
       action: 'suspend_process',
       data: {
-        pid: process?.pid
+        pid: process.pid
       }
     })
   }
 
-  const onBlockNetwork = () => {
-    window.api.sendRequest({
+  const onBlockNetwork = (): void => {
+    window.api.request({
       type: 'network',
       action: 'block_network',
       data: {
@@ -51,8 +57,8 @@ export default function ProcessDialog({ process, onClose }): ReactElement | null
     })
   }
 
-  const onUnblockNetwork = () => {
-    window.api.sendRequest({
+  const onUnblockNetwork = (): void => {
+    window.api.request({
       type: 'network',
       action: 'unblock_network',
       data: {
@@ -167,8 +173,8 @@ export default function ProcessDialog({ process, onClose }): ReactElement | null
                 Suspend
               </Button>
 
-              <Button variant="outline" onClick={onTerminate} className="cursor-pointer">
-                Terminate
+              <Button variant="outline" onClick={onResume} className="cursor-pointer">
+                Resume
               </Button>
 
               <Button variant="destructive" onClick={onKill} className="cursor-pointer">
