@@ -33,7 +33,7 @@ class ProcessManager:
             process.info.update(self.get_input_usage(process.pid))
             processes.append(process.info)
 
-            return {"isSuccess": True, "data": processes}
+        return {"isSuccess": True, "data": processes}
 
     def suspend_process(self, pid):
         try:
