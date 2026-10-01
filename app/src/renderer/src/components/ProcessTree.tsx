@@ -5,26 +5,10 @@ import { Camera, Mic } from 'lucide-react'
 
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
+import { Process } from './types'
 
 const nodeWidth = 180
 const nodeHeight = 60
-
-type Process = {
-  pid: number
-  ppid: number | null
-  name: string
-  camera: boolean
-  mic: boolean
-  username: string
-  cpu_percent: number
-  memory_percent: number
-  memory_info: number
-  num_threads: number
-  cpu_num: number
-  connections: number
-  upload: number
-  download: number
-}
 
 type ProcessNodeType = Node<Process, 'process'>
 

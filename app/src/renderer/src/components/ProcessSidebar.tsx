@@ -13,14 +13,7 @@ import { Button } from './ui/button'
 
 import { Camera, ChevronDown, ChevronRight, Mic } from 'lucide-react'
 import { ScrollArea } from './ui/scroll-area'
-
-type Process = {
-  pid: number
-  ppid: number
-  name: string
-  mic: boolean
-  camera: boolean
-}
+import { Process } from './types'
 
 function ProcessChildren({ root, processes }: { root: Process; processes: Process[] }) {
   const [open, setOpen] = useState(false)
