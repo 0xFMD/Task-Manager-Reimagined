@@ -1,4 +1,5 @@
 import psutil
+import os
 
 
 class ProcessManager:
@@ -29,6 +30,7 @@ class ProcessManager:
             ]
         ):
 
+            process.info.update(self.get_input_usage(process.pid))
             processes.append(process.info)
 
             return {"isSuccess": True, "data": processes}
@@ -93,7 +95,22 @@ class ProcessManager:
         except Exception as e:
             return {"isSuccess": False, "message": str(e)}
 
+    def get_input_usage(self, pid):
+        device = {"camera": False, "mic": False}
+        fd_path = f"/proc/{pid}/fd"
 
-if __name__ == "__main__":
-    pm = ProcessManager()
-    print(pm.list_process())
+        try:
+            for fd in os.listdir(fd_path):
+                dev = os.readlink(f"{fd_path}/{fd}")
+
+                if dev.startswith("/dev/video"):
+                    device["camera"] = True
+
+                if dev.startswith("/dev/snd/pcm") and dev.endswith(
+                    "c"
+                ):  # pcm device ends with "c" means it's capture device
+                    device["mic"] = True
+        except:
+            pass
+
+        return device
