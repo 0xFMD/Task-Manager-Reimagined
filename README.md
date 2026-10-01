@@ -11,7 +11,7 @@
 </p>
 
 <p align="center">
-<img  alt="showcase" src="assets/showcase.gif" width="900"/>
+<img  alt="showcase" src="assets/showcase.png" width="900"/>
 </p>
 
 # About
@@ -49,10 +49,10 @@ Process Visualizer is an electron app to visualize the processes on your machine
 
 ## Under the hood
 
-| Part | Built with |
-|---|---|
-| Backend daemon | Python, `psutil`, `iptc` |
-| Desktop shell | Electron (via `electron-vite`) |
-| Interface | React, TypeScript, `Tailwind CSS`, `shadcn/ui`|
-| Tree view | `React Flow`, `dagre` |
-| Backend link | Unix socket |
+| Part           | Built with                                     |
+| -------------- | ---------------------------------------------- |
+| Backend daemon | Python, `psutil`, `iptc`                       |
+| Desktop shell  | Electron (via `electron-vite`)                 |
+| Interface      | React, TypeScript, `Tailwind CSS`, `shadcn/ui` |
+| Tree view      | `React Flow`, `dagre`                          |
+| Backend link   | Unix socket                                    |
