@@ -11,10 +11,19 @@ const nodeHeight = 60
 
 type Process = {
   pid: number
-  name: string
-  usesCamera: boolean
-  usesMic: boolean
   ppid: number | null
+  name: string
+  camera: boolean
+  mic: boolean
+  username: string
+  cpu_percent: number
+  memory_percent: number
+  memory_info: number
+  num_threads: number
+  cpu_num: number
+  connections: number
+  upload: number
+  download: number
 }
 
 type ProcessNodeType = Node<Process, 'process'>
@@ -31,12 +40,12 @@ function ProcessNode({ data }: NodeProps<ProcessNodeType>) {
       </div>
 
       <div className="flex gap-4 self-center">
-        {data.usesCamera && (
+        {data.camera && (
           <Badge variant="destructive">
             <Camera />
           </Badge>
         )}
-        {data.usesMic && (
+        {data.mic && (
           <Badge variant="destructive">
             <Mic />
           </Badge>
