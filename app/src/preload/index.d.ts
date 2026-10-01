@@ -12,6 +12,7 @@ declare global {
     kill: (pid: number, createTime: number) => Promise<Result>,
     suspend: (pid: number, createTime: number) => Promise<Result>
     resume: (pid: number, createTime: number) => Promise<Result>
+    list: () => Promise<Result>
     }
   }
 }

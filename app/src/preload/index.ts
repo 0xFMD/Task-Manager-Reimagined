@@ -24,8 +24,11 @@ const api = {
   resume: (pid: number, createTime: number): Promise<Result> =>
   ipcRenderer.invoke('daemon:resume', pid, createTime),
 
+  list: (): Promise<Result> =>
+  ipcRenderer.invoke('daemon:list'),
+
   sendRequest: (payload) => {
-    ipcRenderer.send('daemon-request', payload)
+  ipcRenderer.send('daemon-request', payload)
   }
 }
 
