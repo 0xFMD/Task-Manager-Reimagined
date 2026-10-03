@@ -10,17 +10,28 @@ import { Process } from './types'
 const nodeWidth = 180
 const nodeHeight = 60
 
+// on linux -20 is highest priority and to 19 lowest, so 0 is default
+const colorizePriority = (nice: number): string => {
+  if (nice === 0) return ''
+  if (nice < 0) return 'bg-red-100 dark:bg-red-950'
+  return 'bg-blue-100 dark:bg-blue-950'
+}
+
 type ProcessNodeType = Node<Process, 'process'>
 
 function ProcessNode({ data }: NodeProps<ProcessNodeType>) {
   return (
-    <Card className="w-[180px] h-[60px] py-2 px-3 flex flex-col justify-between transition-shadow hover:ring-2 hover:ring-primary">
+    <Card
+      className={`w-[180px] h-[60px] py-2 px-3 flex flex-col justify-between transition-shadow hover:ring-2 hover:ring-primary ${colorizePriority(data.nice)}`}
+    >
       <Handle type="target" position={Position.Top} />
       <Handle type="source" position={Position.Bottom} />
 
       <div>
         <div className="text-sm font-medium">{data.name}</div>
-        <div className="text-xs text-muted-foreground">PID {data.pid}</div>
+        <div className="text-xs text-muted-foreground">
+          PID {data.pid} priority {data.nice}
+        </div>
       </div>
 
       <div className="flex gap-4 self-center">
@@ -102,7 +113,6 @@ function ProcessTree({ processes, onSelectedProcess, status }): React.JSX.Elemen
           maxZoom: 1
         }}
         nodeTypes={nodeTypes}
-
         colorMode="dark"
         onNodeClick={(_, node) => onSelectedProcess(node.data)}
         onlyRenderVisibleElements={true}

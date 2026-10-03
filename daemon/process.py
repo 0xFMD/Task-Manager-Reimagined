@@ -27,6 +27,7 @@ class ProcessManager:
                 "memory_info",
                 "num_threads",
                 "cpu_num",
+                "nice",  # priority
             ]
         ):
 

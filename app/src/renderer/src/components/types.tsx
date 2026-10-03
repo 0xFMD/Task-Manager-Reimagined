@@ -1,4 +1,3 @@
-
 export type Process = {
   pid: number
   ppid: number | null
@@ -14,4 +13,5 @@ export type Process = {
   connections: number
   upload: number
   download: number
+  nice: number
 }
