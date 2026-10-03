@@ -12,7 +12,7 @@ function App(): React.JSX.Element {
 
   useEffect(() => {
     window.api.onMessage((data) => {
-      setProcesses(data.data)
+      if (data?.event === 'list_process') setProcesses(data.data)
     })
     window.api.onStatus(setStatus)
     window.api.getStatus().then(setStatus)
