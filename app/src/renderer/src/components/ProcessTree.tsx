@@ -54,6 +54,18 @@ const nodeTypes = {
   process: ProcessNode
 }
 
+function getSubtree(processes: Process[], rootPid: number): Process[] {
+  const subtree = processes.filter((p) => p.pid === rootPid)
+
+  for (let i = 0; i < subtree.length; i++) {
+    const children = processes.filter((p) => p.ppid === subtree[i].pid)
+
+    subtree.push(...children)
+  }
+
+  return subtree
+}
+
 function getLayoutedElements(nodes: Node<Process>[], edges: Edge[]) {
   const g = new dagre.graphlib.Graph()
   g.setGraph({ rankdir: 'TB' })
@@ -84,13 +96,21 @@ function getLayoutedElements(nodes: Node<Process>[], edges: Edge[]) {
   return { nodes: layoutedNodes, edges }
 }
 
-function ProcessTree({ processes, onSelectedProcess, status }): React.JSX.Element {
-  const nodes: Node<Process>[] = processes.map((process) => {
+function ProcessTree({
+  processes,
+  onSelectedProcess,
+  status,
+  rootPid,
+  onSetRootPid
+}): React.JSX.Element {
+  const procTree = rootPid === null ? processes : getSubtree(processes, rootPid)
+
+  const nodes: Node<Process>[] = procTree.map((process) => {
     return { id: String(process.pid), type: 'process', position: { x: 0, y: 0 }, data: process }
   })
 
-  const edges: Edge[] = processes
-    .filter((process) => process.ppid !== null)
+  const edges: Edge[] = procTree
+    .filter((process) => process.ppid !== null && process.pid !== rootPid)
     .map((process) => {
       return {
         id: `${process.ppid}-${process.pid}`,
@@ -104,6 +124,7 @@ function ProcessTree({ processes, onSelectedProcess, status }): React.JSX.Elemen
   return (
     <div style={{ height: '100vh', width: '100vw' }}>
       <ReactFlow
+        key={rootPid ?? 'all'}
         nodes={layouted.nodes}
         edges={layouted.edges}
         fitView
@@ -117,11 +138,16 @@ function ProcessTree({ processes, onSelectedProcess, status }): React.JSX.Elemen
         onNodeClick={(_, node) => onSelectedProcess(node.data)}
         onlyRenderVisibleElements={true}
       >
-        <Panel
-          position="top-right"
-          className={status === 'connected' ? 'text-green-400' : 'text-red-400'}
-        >
-          {status}
+        <Panel position="top-right" className="flex items-center gap-3">
+          {rootPid && (
+            <Badge className="cursor-pointer" onClick={() => onSetRootPid(null)}>
+              Show all
+            </Badge>
+          )}
+
+          <span className={status === 'connected' ? 'text-green-400' : 'text-red-400'}>
+            {status}
+          </span>
         </Panel>
         <Controls />
       </ReactFlow>

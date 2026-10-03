@@ -6,6 +6,8 @@ import ProcessSidebar from './components/ProcessSidebar'
 
 function App(): React.JSX.Element {
   const [selectedPid, setSelectedPid] = useState<number | null>(null)
+  const [rootPid, setRootPid] = useState<number | null>(null)
+
   const [status, setStatus] = useState('disconnected')
 
   const [processes, setProcesses] = useState([])
@@ -25,8 +27,14 @@ function App(): React.JSX.Element {
   const selectedProcess = processes.find((process) => process.pid === selectedPid)
   return (
     <SidebarProvider>
-      <ProcessSidebar processes={processes} />
-      <ProcessTree processes={processes} onSelectedProcess={onSelectedProcess} status={status} />
+      <ProcessSidebar processes={processes} onSetRootPid={setRootPid} />
+      <ProcessTree
+        processes={processes}
+        onSelectedProcess={onSelectedProcess}
+        status={status}
+        rootPid={rootPid}
+        onSetRootPid={setRootPid}
+      />
       {selectedProcess && (
         <ProcessDialog process={selectedProcess} onClose={() => setSelectedPid(null)} />
       )}

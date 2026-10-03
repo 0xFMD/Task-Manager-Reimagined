@@ -15,7 +15,15 @@ import { Camera, ChevronDown, ChevronRight, Mic } from 'lucide-react'
 import { ScrollArea } from './ui/scroll-area'
 import { Process } from './types'
 
-function ProcessChildren({ root, processes }: { root: Process; processes: Process[] }) {
+function ProcessChildren({
+  root,
+  processes,
+  onSetRootPid
+}: {
+  root: Process
+  processes: Process[]
+  onSetRootPid: (pid: number) => void
+}) {
   const [open, setOpen] = useState(false)
 
   const children = processes.filter((process) => process.ppid === root.pid)
@@ -32,6 +40,7 @@ function ProcessChildren({ root, processes }: { root: Process; processes: Proces
             if (hasChildren) {
               setOpen(!open)
             }
+            onSetRootPid(root.pid)
           }}
         >
           {hasChildren && (open ? <ChevronDown /> : <ChevronRight />)}
@@ -45,14 +54,20 @@ function ProcessChildren({ root, processes }: { root: Process; processes: Proces
       {open &&
         children.map((child) => (
           <div key={child.pid} className="pl-4">
-            <ProcessChildren root={child} processes={processes} />
+            <ProcessChildren root={child} processes={processes} onSetRootPid={onSetRootPid} />
           </div>
         ))}
     </>
   )
 }
 
-export default function ProcessSidebar({ processes }: { processes: Process[] }) {
+export default function ProcessSidebar({
+  processes,
+  onSetRootPid
+}: {
+  processes: Process[]
+  onSetRootPid: (pid: number) => void
+}) {
   const [query, setQuery] = useState('')
   const [micOnly, setMicOnly] = useState(false)
   const [cameraOnly, setCameraOnly] = useState(false)
@@ -103,15 +118,23 @@ export default function ProcessSidebar({ processes }: { processes: Process[] }) 
               {query !== '' || micOnly || cameraOnly
                 ? filteredProcs.map((process) => (
                     <SidebarMenuItem key={process.pid}>
-                      <Button variant="ghost" className="w-full justify-start">
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start"
+                        onClick={() => onSetRootPid(process.pid)}
+                      >
                         <span>{process.name}</span>
-
                         <span className="ml-auto text-xs text-muted-foreground">{process.pid}</span>
                       </Button>
                     </SidebarMenuItem>
                   ))
                 : rootProcs.map((process) => (
-                    <ProcessChildren key={process.pid} root={process} processes={processes} />
+                    <ProcessChildren
+                      key={process.pid}
+                      root={process}
+                      processes={processes}
+                      onSetRootPid={onSetRootPid}
+                    />
                   ))}
             </SidebarMenu>
           </SidebarGroup>
