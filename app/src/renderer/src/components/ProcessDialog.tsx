@@ -1,4 +1,4 @@
-import { ReactElement } from 'react'
+import { ReactElement, useEffect, useState } from 'react'
 import { Dialog, DialogContent, DialogHeader } from './ui/dialog'
 import { Button } from './ui/button'
 
@@ -10,6 +10,24 @@ const colorize = (number: number) => {
 
 export default function ProcessDialog({ process, onClose }): ReactElement | null {
   if (!process) return null
+  const [network, setNetwork] = useState(null)
+
+  useEffect(() => {
+    window.api.request({
+      type: 'network',
+      action: 'get_usage_network',
+      data: {
+        pid: process.pid
+      }
+    })
+
+    return window.api.onMessage((message) => {
+      if (message.action === 'get_usage_network') {
+        console.log(message)
+        setNetwork(message.data)
+      }
+    })
+  }, [process.pid])
 
   const onKill = (): void => {
     if (!process) return
@@ -66,7 +84,6 @@ export default function ProcessDialog({ process, onClose }): ReactElement | null
       }
     })
   }
-
   return (
     <Dialog
       open={!!process}
@@ -140,30 +157,19 @@ export default function ProcessDialog({ process, onClose }): ReactElement | null
           <section>
             <h2 className="mb-2 border-b pb-1 text-lg font-semibold">Network</h2>
 
-            <div>
-              <div className="mb-4 grid grid-cols-2 gap-y-2 text-sm">
-                <span className="text-muted-foreground">Connections</span>
+            <div className="mb-4 grid grid-cols-2 gap-y-2 text-sm">
+              <span className="text-muted-foreground">Connections</span>
+              <span className="font-semibold">{network?.connections_count}</span>
+            </div>
 
-                <span className="font-semibold">{process?.connections_count}</span>
+            <div className="flex justify-around ">
+              <Button variant="destructive" onClick={onBlockNetwork} className="cursor-pointer">
+                Block Network
+              </Button>
 
-                <span className="text-muted-foreground">Download</span>
-
-                <span className="font-semibold">{process?.net_rx} KB/s</span>
-
-                <span className="text-muted-foreground">Upload</span>
-
-                <span className="font-semibold">{process?.net_tx} KB/s</span>
-              </div>
-
-              <div className="flex justify-around ">
-                <Button variant="destructive" onClick={onBlockNetwork} className="cursor-pointer">
-                  Block Network
-                </Button>
-
-                <Button variant="outline" onClick={onUnblockNetwork} className="cursor-pointer">
-                  Unblock Network
-                </Button>
-              </div>
+              <Button variant="outline" onClick={onUnblockNetwork} className="cursor-pointer">
+                Unblock Network
+              </Button>
             </div>
           </section>
 

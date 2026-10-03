@@ -89,7 +89,9 @@ class Daemon:
         if handler is None:
             return {"isSuccess": False, "message": "invalid handler"}
 
-        return handler(**data)
+        result = handler(**data)
+
+        return {"type": req_type, "action": req_action, **result}
 
 
 if __name__ == "__main__":
